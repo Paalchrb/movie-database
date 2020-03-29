@@ -10,7 +10,7 @@ Use what you've learned this week to create a full stack JavaScript application 
 
 The application is a movie collector / archiver with the following functionality (required):
 
-You should be able to add movies to your archive with the following information:
+- You should be able to add movies to your archive with the following information:
     - The title of the movie
     - A movie poster (image)
     - The year of release
