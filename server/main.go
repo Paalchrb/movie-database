@@ -10,8 +10,15 @@ func main() {
 	//Handles browser equest to favicon.ico
 	http.Handle("/favicon.ico", http.NotFoundHandler())
 
+	//Serves style.css
+	http.Handle("/styles/", http.StripPrefix("/styles", http.FileServer(http.Dir("./templates/styles"))))
+
+	//Routing
 	http.HandleFunc("/", index)
-	http.HandleFunc("/movies", movies.Index)
+	http.HandleFunc("/movies", movies.ShowAll)
+	http.HandleFunc("/movies/show", movies.ShowOne)
+
+	//Listen and serve at port 3000:
 	http.ListenAndServe(":3000", nil)
 }
 

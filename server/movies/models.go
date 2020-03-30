@@ -1,6 +1,9 @@
 package movies
 
 import (
+	"errors"
+	"net/http"
+
 	"github.com/Paalchrb/movie-database/server/config"
 )
 
@@ -16,8 +19,8 @@ type Movie struct {
 	Summary  string
 }
 
-//AllMovies fetches all rows from database
-func AllMovies() ([]Movie, error) {
+//GetAllMovies returns all rows from movie table
+func GetAllMovies() ([]Movie, error) {
 	rows, err := config.DB.Query("SELECT * FROM movies")
 	if err != nil {
 		return nil, err
@@ -36,4 +39,22 @@ func AllMovies() ([]Movie, error) {
 		return nil, err
 	}
 	return movies, nil
+}
+
+//GetMovieByID returns one row from movie table, based on provided id
+func GetMovieByID(req *http.Request) (Movie, error) {
+	movie := Movie{}
+	id := req.FormValue("id")
+	if id == "" {
+		return movie, errors.New("400. Bad request")
+	}
+
+	row := config.DB.QueryRow("SELECT * FROM movies WHERE id=$1", id)
+
+	err := row.Scan(&movie.ID, &movie.Title, &movie.Poster, &movie.Year, &movie.Genre, &movie.Rating, &movie.Duration, &movie.Summary) // order matters
+	if err != nil {
+		return movie, err
+	}
+
+	return movie, nil
 }
