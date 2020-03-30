@@ -23,7 +23,7 @@ type Movie struct {
 
 //GetAllMovies returns all rows from movie table
 func GetAllMovies() ([]Movie, error) {
-	rows, err := config.DB.Query("SELECT * FROM movies ORDER BY id ASC")
+	rows, err := config.DB.Query("SELECT * FROM movies ORDER BY rating DESC;")
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +51,7 @@ func GetMovieByID(req *http.Request) (Movie, error) {
 		return movie, errors.New("400. Bad request")
 	}
 
-	row := config.DB.QueryRow("SELECT * FROM movies WHERE id=$1", id)
+	row := config.DB.QueryRow("SELECT * FROM movies WHERE id=$1;", id)
 
 	err := row.Scan(&movie.ID, &movie.Title, &movie.Poster, &movie.Year, &movie.Genre, &movie.Rating, &movie.Duration, &movie.Summary) // order matters
 	if err != nil {
@@ -84,7 +84,7 @@ func CreateMovie(req *http.Request) (Movie, error) {
 	}
 
 	//insert values
-	_, err := config.DB.Exec("INSERT INTO movies (title, poster, year, genre, rating, duration, summary) VALUES ($1, $2, $3, $4, $5, $6, $7)", movie.Title, movie.Poster, movie.Year, movie.Genre, movie.Rating, movie.Duration, movie.Summary)
+	_, err := config.DB.Exec("INSERT INTO movies (title, poster, year, genre, rating, duration, summary) VALUES ($1, $2, $3, $4, $5, $6, $7);", movie.Title, movie.Poster, movie.Year, movie.Genre, movie.Rating, movie.Duration, movie.Summary)
 	if err != nil {
 		return movie, errors.New("500. Internal Server Error." + err.Error())
 	}
@@ -116,11 +116,25 @@ func UpdateMovie(req *http.Request, i string) (Movie, error) {
 	}
 
 	//insert values
-	_, err := config.DB.Exec("UPDATE movies SET title = $1, poster = $2, year = $3, genre = $4, rating = $5, duration = $6, summary = $7 WHERE id = $8", movie.Title, movie.Poster, movie.Year, movie.Genre, movie.Rating, movie.Duration, movie.Summary, id)
+	_, err := config.DB.Exec("UPDATE movies SET title = $1, poster = $2, year = $3, genre = $4, rating = $5, duration = $6, summary = $7 WHERE id = $8;", movie.Title, movie.Poster, movie.Year, movie.Genre, movie.Rating, movie.Duration, movie.Summary, id)
 	if err != nil {
 		fmt.Println(err)
 		return movie, errors.New("500. Internal Server Error." + err.Error())
 	}
 
 	return movie, nil
+}
+
+//DeleteBook removes the row with corresponding ID from database
+func DeleteBook(req *http.Request) error {
+	id := req.FormValue("id")
+	if id == "" {
+		return errors.New("400. Bad request")
+	}
+
+	_, err := config.DB.Exec("DELETE FROM movies WHERE id=$1;", id)
+	if err != nil {
+		return errors.New("500. Internal server error")
+	}
+	return nil
 }

@@ -2,7 +2,6 @@ package movies
 
 import (
 	"database/sql"
-	"fmt"
 	"net/http"
 
 	"github.com/Paalchrb/movie-database/server/config"
@@ -10,7 +9,6 @@ import (
 
 //ShowAll fetches data about all movies and loads template
 func ShowAll(w http.ResponseWriter, req *http.Request) {
-	fmt.Println("New request:", req.URL, req.Method)
 	if req.Method != "GET" {
 		http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
 		return
@@ -27,7 +25,6 @@ func ShowAll(w http.ResponseWriter, req *http.Request) {
 
 //ShowOne fetches data about one movie, based on unique ID:
 func ShowOne(w http.ResponseWriter, req *http.Request) {
-	fmt.Println("New request:", req.URL, req.Method)
 	if req.Method != "GET" {
 		http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
 		return
@@ -48,7 +45,6 @@ func ShowOne(w http.ResponseWriter, req *http.Request) {
 
 //Create adds a new movie instance to database:
 func Create(w http.ResponseWriter, req *http.Request) {
-	fmt.Println("New request:", req.URL, req.Method)
 	switch req.Method {
 	case "GET":
 		config.TPL.ExecuteTemplate(w, "create.gohtml", nil)
@@ -72,7 +68,6 @@ func createMovie(w http.ResponseWriter, req *http.Request) {
 
 //Update changes the movie with the provided ID:
 func Update(w http.ResponseWriter, req *http.Request) {
-	fmt.Println("New request:", req.URL, req.Method)
 	id := req.FormValue("id")
 	switch req.Method {
 	case "GET":
@@ -106,4 +101,19 @@ func updateMovie(w http.ResponseWriter, req *http.Request, id string) {
 	}
 
 	config.TPL.ExecuteTemplate(w, "created.gohtml", movie)
+}
+
+//Delete deletes the movie with the provided ID:
+func Delete(w http.ResponseWriter, req *http.Request) {
+	if req.Method != "GET" {
+		http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
+		return
+	}
+
+	err := DeleteBook(req)
+	if err != nil {
+		http.Error(w, http.StatusText(400), http.StatusBadRequest)
+	}
+
+	http.Redirect(w, req, "/books", http.StatusSeeOther)
 }
