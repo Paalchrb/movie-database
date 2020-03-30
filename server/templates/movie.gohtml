@@ -1,0 +1,10 @@
+{{template "header"}}
+<h2><b>{{.Title}}</b> - <em>{{.Rating}}</em></h2>
+<img class="poster-img" src={{.Poster}} alt="movie cover for {{.Title}}"/>
+<ul>
+  <li>Year: {{.Year}}</li>
+  <li>Genre: {{.Genre}}</li>
+  <li>Playtime: {{.Duration}}</li>
+</ul>
+<p>{{.Summary}}</p>
+{{template "footer"}}

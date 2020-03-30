@@ -20,3 +20,5 @@
 !**/
 !**/*.md
 !LICENSE
+!**/*.gohtml
+!**/*.css
