@@ -2,7 +2,9 @@ package movies
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/Paalchrb/movie-database/server/config"
 )
@@ -21,7 +23,7 @@ type Movie struct {
 
 //GetAllMovies returns all rows from movie table
 func GetAllMovies() ([]Movie, error) {
-	rows, err := config.DB.Query("SELECT * FROM movies")
+	rows, err := config.DB.Query("SELECT * FROM movies ORDER BY id ASC")
 	if err != nil {
 		return nil, err
 	}
@@ -54,6 +56,70 @@ func GetMovieByID(req *http.Request) (Movie, error) {
 	err := row.Scan(&movie.ID, &movie.Title, &movie.Poster, &movie.Year, &movie.Genre, &movie.Rating, &movie.Duration, &movie.Summary) // order matters
 	if err != nil {
 		return movie, err
+	}
+
+	return movie, nil
+}
+
+//CreateMovie get formdata from template and insert new row in movies table
+func CreateMovie(req *http.Request) (Movie, error) {
+	movie := Movie{}
+	movie.Title = req.FormValue("title")
+	movie.Poster = req.FormValue("poster")
+	movie.Year = req.FormValue("year")
+	movie.Genre = req.FormValue("genre")
+	movie.Rating = req.FormValue("rating")
+	movie.Duration = req.FormValue("duration")
+	movie.Summary = req.FormValue("summary")
+
+	// validate form values
+	if movie.Title == "" ||
+		movie.Poster == "" ||
+		movie.Year == "" ||
+		movie.Genre == "" ||
+		movie.Rating == "" ||
+		movie.Duration == "" ||
+		movie.Summary == "" {
+		return movie, errors.New("400. Bad request. All fields must be complete")
+	}
+
+	//insert values
+	_, err := config.DB.Exec("INSERT INTO movies (title, poster, year, genre, rating, duration, summary) VALUES ($1, $2, $3, $4, $5, $6, $7)", movie.Title, movie.Poster, movie.Year, movie.Genre, movie.Rating, movie.Duration, movie.Summary)
+	if err != nil {
+		return movie, errors.New("500. Internal Server Error." + err.Error())
+	}
+
+	return movie, nil
+}
+
+//UpdateMovie get formdata from template and updates row with provided id
+func UpdateMovie(req *http.Request, i string) (Movie, error) {
+	movie := Movie{}
+	movie.Title = req.FormValue("title")
+	movie.Poster = req.FormValue("poster")
+	movie.Year = req.FormValue("year")
+	movie.Genre = req.FormValue("genre")
+	movie.Rating = req.FormValue("rating")
+	movie.Duration = req.FormValue("duration")
+	movie.Summary = req.FormValue("summary")
+	id, _ := strconv.Atoi(i)
+
+	// validate form values
+	if movie.Title == "" ||
+		movie.Poster == "" ||
+		movie.Year == "" ||
+		movie.Genre == "" ||
+		movie.Rating == "" ||
+		movie.Duration == "" ||
+		movie.Summary == "" {
+		return movie, errors.New("400. Bad request. All fields must be complete")
+	}
+
+	//insert values
+	_, err := config.DB.Exec("UPDATE movies SET title = $1, poster = $2, year = $3, genre = $4, rating = $5, duration = $6, summary = $7 WHERE id = $8", movie.Title, movie.Poster, movie.Year, movie.Genre, movie.Rating, movie.Duration, movie.Summary, id)
+	if err != nil {
+		fmt.Println(err)
+		return movie, errors.New("500. Internal Server Error." + err.Error())
 	}
 
 	return movie, nil

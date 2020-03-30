@@ -45,3 +45,65 @@ func ShowOne(w http.ResponseWriter, req *http.Request) {
 
 	config.TPL.ExecuteTemplate(w, "movie.gohtml", movie)
 }
+
+//Create adds a new movie instance to database:
+func Create(w http.ResponseWriter, req *http.Request) {
+	fmt.Println("New request:", req.URL, req.Method)
+	switch req.Method {
+	case "GET":
+		config.TPL.ExecuteTemplate(w, "create.gohtml", nil)
+		break
+	case "POST":
+		createMovie(w, req)
+	default:
+		http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
+	}
+}
+
+func createMovie(w http.ResponseWriter, req *http.Request) {
+	movie, err := CreateMovie(req)
+	if err != nil {
+		http.Error(w, http.StatusText(406), http.StatusNotAcceptable)
+		return
+	}
+
+	config.TPL.ExecuteTemplate(w, "created.gohtml", movie)
+}
+
+//Update changes the movie with the provided ID:
+func Update(w http.ResponseWriter, req *http.Request) {
+	fmt.Println("New request:", req.URL, req.Method)
+	id := req.FormValue("id")
+	switch req.Method {
+	case "GET":
+		renderForm(w, req)
+	case "POST":
+		updateMovie(w, req, id)
+	default:
+		http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
+	}
+}
+
+func renderForm(w http.ResponseWriter, req *http.Request) {
+	movie, err := GetMovieByID(req)
+	switch {
+	case err == sql.ErrNoRows:
+		http.NotFound(w, req)
+		return
+	case err != nil:
+		http.Error(w, http.StatusText(500), http.StatusInternalServerError)
+		return
+	}
+
+	config.TPL.ExecuteTemplate(w, "update.gohtml", movie)
+}
+
+func updateMovie(w http.ResponseWriter, req *http.Request, id string) {
+	movie, err := UpdateMovie(req, id)
+	if err != nil {
+		http.Error(w, http.StatusText(406), http.StatusNotAcceptable)
+		return
+	}
+
+	config.TPL.ExecuteTemplate(w, "created.gohtml", movie)
+}

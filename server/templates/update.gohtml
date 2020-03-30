@@ -1,0 +1,13 @@
+{{template "header"}}
+<h1>Update movie: {{.Title}}</h1>
+<form method="post" action="/movies/update?id={{.ID}}">
+    <input type="text" name="title" placeholder="title" required autofocus value={{.Title}} />
+    <input type="text" name="poster" placeholder="poster" required value={{.Poster}} />
+    <input type="text" name="year" placeholder="year" required value={{.Year}} />
+    <input type="text" name="genre" placeholder="genre" required value={{.Genre}} />
+    <input type="text" name="rating" placeholder="rating" required value={{.Rating}} />
+    <input type="text" name="duration" placeholder="duration" required value={{.Duration}} />
+    <input type="text" name="summary" placeholder="summary" required value={{.Summary}} />
+    <input type="submit" />
+</form>
+{{template "footer"}}

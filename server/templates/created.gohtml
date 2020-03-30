@@ -1,4 +1,5 @@
 {{template "header"}}
+<h1>Success! Movie added/updated: </h1>
 <h2><b>{{.Title}}</b> - <em>{{.Rating}}</em></h2>
 <img class="poster-img" src={{.Poster}} alt="movie cover for {{.Title}}"/>
 <ul>
@@ -7,5 +8,5 @@
   <li>Playtime: {{.Duration}}</li>
 </ul>
 <p>{{.Summary}}</p>
-<a href="/movies">Back to overview</a>
+<a href="/movies">Overview</a>
 {{template "footer"}}

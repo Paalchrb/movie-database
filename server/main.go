@@ -17,6 +17,8 @@ func main() {
 	http.HandleFunc("/", index)
 	http.HandleFunc("/movies", movies.ShowAll)
 	http.HandleFunc("/movies/show", movies.ShowOne)
+	http.HandleFunc("/movies/create", movies.Create)
+	http.HandleFunc("/movies/update", movies.Update)
 
 	//Listen and serve at port 3000:
 	http.ListenAndServe(":3000", nil)
